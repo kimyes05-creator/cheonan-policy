@@ -1,0 +1,407 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="description" content="천안시 정책 찾기 — 나에게 필요한 정부·지자체 혜택을 찾아드려요">
+<meta property="og:title" content="천안시 정책 찾기">
+<meta property="og:description" content="나에게 필요한 정부·지자체 혜택을 찾아드려요">
+<title>천안시 정책 찾기</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@400;500;700&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --primary: #1B5E8C;
+    --primary-light: #E6F1FB;
+    --primary-text: #0C447C;
+    --green: #EAF3DE;
+    --green-text: #27500A;
+    --bg: #F7F8FA;
+    --white: #ffffff;
+    --border: rgba(0,0,0,0.1);
+    --border-light: rgba(0,0,0,0.06);
+    --text-main: #1a1a1a;
+    --text-sub: #555;
+    --text-hint: #999;
+    --radius: 14px;
+    --radius-sm: 8px;
+  }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body {
+    font-family: 'Noto Sans KR', sans-serif;
+    background: var(--bg);
+    color: var(--text-main);
+    min-height: 100vh;
+  }
+  /* 헤더 */
+  .header {
+    background: var(--white);
+    border-bottom: 1px solid var(--border-light);
+    padding: 14px 20px;
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    position: sticky;
+    top: 0;
+    z-index: 100;
+  }
+  .header-icon {
+    width: 38px; height: 38px;
+    background: var(--primary-light);
+    border-radius: 50%;
+    display: flex; align-items: center; justify-content: center;
+    flex-shrink: 0;
+  }
+  .header-icon svg { width: 20px; height: 20px; fill: var(--primary-text); }
+  .header-title { font-size: 15px; font-weight: 700; color: var(--text-main); }
+  .header-sub { font-size: 12px; color: var(--text-sub); margin-top: 1px; }
+
+  /* 메인 */
+  .main {
+    max-width: 680px;
+    margin: 0 auto;
+    padding: 16px 16px 20px;
+  }
+
+  /* 빠른검색 칩 */
+  .chips-section { margin-bottom: 16px; }
+  .chips-label { font-size: 12px; color: var(--text-hint); margin-bottom: 8px; }
+  .chips {
+    display: flex; flex-wrap: wrap; gap: 7px;
+  }
+  .chip {
+    font-size: 13px; padding: 6px 14px;
+    border-radius: 20px;
+    border: 1px solid var(--border);
+    background: var(--white);
+    color: var(--text-sub);
+    cursor: pointer;
+    transition: all 0.15s;
+    font-family: inherit;
+  }
+  .chip:hover, .chip:active {
+    background: var(--primary);
+    color: var(--white);
+    border-color: var(--primary);
+  }
+
+  /* 채팅 영역 */
+  #chat-area {
+    display: flex; flex-direction: column; gap: 12px;
+    margin-bottom: 16px;
+  }
+  .bubble-bot {
+    align-self: flex-start;
+    background: var(--white);
+    border: 1px solid var(--border-light);
+    border-radius: 16px 16px 16px 4px;
+    padding: 12px 16px;
+    max-width: 88%;
+    font-size: 14px;
+    line-height: 1.65;
+    color: var(--text-main);
+    box-shadow: 0 1px 4px rgba(0,0,0,0.04);
+  }
+  .bubble-bot .hint {
+    font-size: 12px; color: var(--text-hint); margin-top: 4px; display: block;
+  }
+  .bubble-user {
+    align-self: flex-end;
+    background: var(--primary);
+    color: white;
+    border-radius: 16px 16px 4px 16px;
+    padding: 12px 16px;
+    max-width: 82%;
+    font-size: 14px;
+    line-height: 1.65;
+  }
+
+  /* 정책 카드 */
+  .p-cards { display: flex; flex-direction: column; gap: 8px; margin-top: 10px; }
+  .p-card {
+    background: var(--white);
+    border: 1px solid var(--border-light);
+    border-radius: var(--radius);
+    padding: 14px 16px;
+    box-shadow: 0 1px 4px rgba(0,0,0,0.04);
+  }
+  .p-card-head {
+    display: flex; align-items: center; gap: 6px;
+    flex-wrap: wrap; margin-bottom: 6px;
+  }
+  .badge {
+    font-size: 11px; padding: 2px 9px;
+    border-radius: 20px; font-weight: 500; white-space: nowrap;
+  }
+  .b-n { background: #E6F1FB; color: #0C447C; }
+  .b-l { background: #EAF3DE; color: #27500A; }
+  .b-pregnancy { background: #EEEDFE; color: #3C3489; }
+  .b-birth { background: #EAF3DE; color: #27500A; }
+  .b-childcare { background: #E1F5EE; color: #085041; }
+  .b-multichildren { background: #FBEAF0; color: #72243E; }
+  .b-housing { background: #FAEEDA; color: #633806; }
+  .b-work { background: #E6F1FB; color: #185FA5; }
+  .b-youth { background: #FAECE7; color: #712B13; }
+  .b-senior { background: #F1EFE8; color: #444441; }
+  .b-welfare { background: #FCEBEB; color: #791F1F; }
+  .p-name { font-size: 14px; font-weight: 700; color: var(--text-main); }
+  .p-desc { font-size: 13px; color: var(--text-sub); line-height: 1.55; margin-bottom: 8px; }
+  .p-meta { display: flex; flex-direction: column; gap: 3px; }
+  .p-meta span { font-size: 12px; color: var(--text-hint); }
+  .p-meta strong { color: var(--text-sub); font-weight: 500; }
+  .p-contact {
+    font-size: 12px; color: var(--text-hint);
+    margin-top: 8px; padding-top: 8px;
+    border-top: 1px solid var(--border-light);
+  }
+  .p-contact strong { color: var(--text-sub); font-weight: 500; }
+  .result-label {
+    font-size: 12px; color: var(--text-hint); margin-bottom: 4px;
+  }
+  .greeting { font-size: 14px; margin-bottom: 6px; font-weight: 500; }
+  .tip {
+    font-size: 12px; color: var(--text-hint);
+    margin-top: 10px; padding-top: 10px;
+    border-top: 1px solid var(--border-light);
+  }
+
+  /* 입력창 (하단 고정) */
+  .input-wrap {
+    background: var(--white);
+    border-top: 1px solid var(--border-light);
+    padding: 12px 16px;
+    position: sticky;
+    bottom: 0;
+    z-index: 100;
+  }
+  .input-inner {
+    max-width: 680px; margin: 0 auto;
+    display: flex; gap: 8px; align-items: flex-end;
+  }
+  #user-input {
+    flex: 1; resize: none;
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    padding: 10px 14px;
+    font-size: 14px;
+    font-family: inherit;
+    color: var(--text-main);
+    background: var(--bg);
+    min-height: 44px; max-height: 120px;
+    line-height: 1.5;
+    outline: none;
+    transition: border-color 0.15s;
+  }
+  #user-input:focus { border-color: var(--primary); background: var(--white); }
+  #send-btn {
+    height: 44px; padding: 0 18px;
+    border-radius: 12px;
+    border: none;
+    background: var(--primary);
+    color: white;
+    font-size: 14px;
+    font-weight: 500;
+    cursor: pointer;
+    font-family: inherit;
+    white-space: nowrap;
+    transition: opacity 0.15s;
+    flex-shrink: 0;
+  }
+  #send-btn:active { opacity: 0.85; }
+
+  /* 반응형 */
+  @media (max-width: 480px) {
+    .bubble-bot, .bubble-user { max-width: 95%; }
+  }
+</style>
+</head>
+<body>
+
+<div class="header">
+  <div class="header-icon">
+    <svg viewBox="0 0 24 24"><path d="M12 2C8.13 2 5 5.13 5 9c0 5.25 7 13 7 13s7-7.75 7-13c0-3.87-3.13-7-7-7zm0 9.5c-1.38 0-2.5-1.12-2.5-2.5s1.12-2.5 2.5-2.5 2.5 1.12 2.5 2.5-1.12 2.5-2.5 2.5z"/></svg>
+  </div>
+  <div>
+    <div class="header-title">천안시 정책 찾기</div>
+    <div class="header-sub">나에게 필요한 정부·지자체 혜택을 찾아드려요</div>
+  </div>
+</div>
+
+<div class="main">
+  <div class="chips-section">
+    <div class="chips-label">빠른 검색</div>
+    <div class="chips">
+      <button class="chip" onclick="fill('결혼 예정인 30대 회사원 천안')">결혼 앞둔 직장인</button>
+      <button class="chip" onclick="fill('임신 중 천안 거주')">임신 중이에요</button>
+      <button class="chip" onclick="fill('출산 아이 둘 천안')">출산 지원</button>
+      <button class="chip" onclick="fill('타지역에서 천안으로 이사온 1인 가구 청년')">전입 청년 1인가구</button>
+      <button class="chip" onclick="fill('일자리 취업 천안 청년')">일자리 지원</button>
+      <button class="chip" onclick="fill('청년 월세 주거비 부담')">청년 주거·월세</button>
+      <button class="chip" onclick="fill('어르신 노인 복지 천안')">어르신 복지</button>
+      <button class="chip" onclick="fill('다자녀 셋째 혜택')">다자녀 혜택</button>
+      <button class="chip" onclick="fill('귀농 귀촌 천안 농촌 정착')">귀농·귀촌</button>
+    </div>
+  </div>
+
+  <div id="chat-area">
+    <div class="bubble-bot">
+      안녕하세요! 나이, 직업, 상황을 편하게 입력하시면 알맞은 정책을 찾아드릴게요.
+      <span class="hint">예: "천안으로 취업해서 타지역에서 이사오게 된 30세 1인가구에요. 어떤 혜택이 있나요?"</span>
+    </div>
+  </div>
+</div>
+
+<div class="input-wrap">
+  <div class="input-inner">
+    <textarea id="user-input" rows="1" placeholder="상황을 자유롭게 입력하세요..."></textarea>
+    <button id="send-btn" onclick="send()">검색 ↗</button>
+  </div>
+</div>
+
+<script>
+const POLICIES=[
+  {id:1,name:"임신·출산 진료비 지원 (국민행복카드)",type:"n",cat:"pregnancy",benefit:"임신 1회당 100만원 / 다태아 140만원",target:"임신이 확인된 건강보험 가입자",desc:"임산부의 임신·출산 진료비 및 2세 미만 영유아 진료비를 국민행복카드 바우처로 지원합니다.",dept:"국민건강보험공단",tel:"1577-1000",kw:["임신","출산","진료비","임산부","의료","국민행복카드"]},
+  {id:2,name:"제왕절개 비용 무료화",type:"n",cat:"pregnancy",benefit:"본인부담률 0%",target:"제왕절개로 분만하는 산모",desc:"제왕절개 분만 시 본인 부담금이 없습니다.",dept:"국민건강보험공단",tel:"1577-1000",kw:["임신","출산","제왕절개","수술","분만"]},
+  {id:3,name:"여성장애인 출산지원금",type:"l",cat:"pregnancy",benefit:"중증 150만원 / 경증 120만원",target:"천안시 주민등록 여성장애인 (임신 4개월 이상)",desc:"천안시에 거주하는 여성장애인의 출산을 지원합니다.",dept:"장애인복지과",tel:"041-521-4248",kw:["임신","출산","장애인","천안"]},
+  {id:4,name:"첫아이 맞이 예비맘 종합건강검진",type:"l",cat:"pregnancy",benefit:"1인당 12만원 검진비용 지원",target:"천안시 6개월 이상 거주 첫아이 예비 산모",desc:"첫아이 임신 전 필수 건강검진(21종) 비용을 지원합니다.",dept:"보건소 영유아모성팀",tel:"동남구 521-5035 / 서북구 521-5511",kw:["임신","건강검진","첫째","예비맘","결혼","천안"]},
+  {id:5,name:"임신 사전건강관리 지원",type:"l",cat:"pregnancy",benefit:"여성 최대 13만원 / 남성 최대 5만원",target:"천안 관내 20~49세 남녀",desc:"난소나이검사, 자궁초음파, 정액검사 등 임신 준비 검진비용을 지원합니다.",dept:"보건소 영유아모성팀",tel:"동남구 521-5035 / 서북구 521-5907",kw:["임신","건강검진","난임","결혼","준비","천안"]},
+  {id:6,name:"난임 부부 시술비 지원",type:"l",cat:"pregnancy",benefit:"체외수정 최대 110만원 / 인공수정 최대 30만원",target:"난임진단을 받은 부부 (사실혼 포함, 소득기준 없음)",desc:"난임 시술 본인부담금 및 비급여 일부를 지원합니다.",dept:"보건소 영유아모성팀",tel:"동남구 521-5035 / 서북구 521-5937",kw:["난임","시술","임신","부부","천안"]},
+  {id:7,name:"난임 부부 한방치료비 지원",type:"l",cat:"pregnancy",benefit:"여성 연 1회 최대 150만원 / 남성 최대 100만원",target:"충남 도내 6개월 이상 거주 난임부부",desc:"비급여 한약 첩약비를 지원합니다.",dept:"보건소 영유아모성팀",tel:"동남구 521-5035 / 서북구 521-5937",kw:["난임","한방","치료","임신","충남"]},
+  {id:8,name:"행복 출산 천안형 산후조리 지원",type:"l",cat:"pregnancy",benefit:"단태아 50만원(일반)/300만원(저소득) · 쌍태아 100만원/450만원",target:"천안시 거주 출산 가정",desc:"천안사랑카드를 통해 산후조리 비용을 지원합니다.",dept:"보건소 영유아모성팀",tel:"동남구 521-5030 / 서북구 521-5511",kw:["출산","산후조리","산후","천안","조리원"]},
+  {id:9,name:"임산부 교통비 지원",type:"l",cat:"pregnancy",benefit:"1인당 50만원 교통비 바우처카드",target:"천안시 6개월 이상 거주 임산부 (임신 12주 이상)",desc:"자가용 유류비·택시비로 사용 가능한 지역화폐 바우처카드를 지급합니다.",dept:"여성가족과",tel:"041-521-5374",kw:["임산부","임신","교통비","교통","천안"]},
+  {id:10,name:"임산부 공영주차장 주차요금 면제",type:"l",cat:"pregnancy",benefit:"주차요금 면제",target:"임산부 스티커 부착 차량",desc:"천안시 공영주차장에서 임산부 차량 주차요금이 면제됩니다.",dept:"교통정책과",tel:"041-521-2871",kw:["임산부","임신","주차","면제","천안"]},
+  {id:11,name:"맘편한 KTX 임산부 할인",type:"n",cat:"pregnancy",benefit:"우등실 동일 요금 또는 일반열차 40% 할인",target:"임산부 본인 코레일멤버십 회원",desc:"임산부는 KTX를 특실·우등실 동일 요금으로 이용하거나 40% 할인받습니다.",dept:"코레일",tel:"1544-7788",kw:["임산부","임신","KTX","기차","교통","할인"]},
+  {id:12,name:"산전 초기검사 지원",type:"l",cat:"pregnancy",benefit:"7종 검사 무료",target:"보건소 등록 초기 임신부 (임신 6~10주)",desc:"빈혈·간기능·혈액형 등 7종 검사를 보건소에서 무료로 받을 수 있습니다.",dept:"보건소 영유아모성팀",tel:"동남구 521-5035 / 서북구 521-5937",kw:["임신","산전","검사","보건소","무료","천안"]},
+  {id:13,name:"출생축하금 지원",type:"l",cat:"birth",benefit:"첫째 100만원 / 둘째 100만원 / 셋째↑ 1,000만원(5년 분할)",target:"천안시 6개월 이상 주민등록 거주 가정",desc:"아이 출생 시 출생축하금을 지급합니다. 셋째 이상은 5년간 분할 지급.",dept:"여성가족과",tel:"041-521-5374",kw:["출산","출생","축하금","지원금","천안","첫째","둘째","셋째","다자녀"]},
+  {id:14,name:"첫만남이용권 지원",type:"n",cat:"birth",benefit:"첫째 200만원 / 둘째↑ 300만원 (국민행복카드)",target:"출생 신고된 모든 신생아",desc:"출생 직후 지급되는 국가 바우처입니다.",dept:"주소지 행정복지센터",tel:"정부24(gov.kr)",kw:["출산","출생","첫만남","바우처","신생아","지원금"]},
+  {id:15,name:"아빠육아휴직 장려금",type:"l",cat:"birth",benefit:"월 30만원 최대 6개월",target:"천안시 거주 육아휴직 사용 아버지",desc:"아버지의 육아 참여를 장려하기 위해 아빠 육아휴직 사용 시 장려금을 지급합니다.",dept:"여성가족과 일가정양립팀",tel:"041-521-5372",kw:["육아휴직","아빠","아버지","천안","직장"]},
+  {id:16,name:"보육료 및 양육수당 지원",type:"n",cat:"childcare",benefit:"0세 584,000원 / 1세 515,000원 / 가정양육수당 월 10만원",target:"어린이집 이용 영유아(0~5세) 및 미이용 24~86개월 아동",desc:"어린이집 이용 아동에게 보육료 바우처를, 가정 양육 아동에게 양육수당을 지급합니다.",dept:"주소지 행정복지센터",tel:"정부24(gov.kr)",kw:["보육","보육료","어린이집","양육수당","영유아","아이"]},
+  {id:17,name:"아동수당 지원",type:"n",cat:"childcare",benefit:"월 10만원 (만 9세 생일 전 달까지)",target:"만 9세 미만 모든 아동",desc:"소득·재산 기준 없이 매월 25일 통장으로 지급됩니다.",dept:"주소지 행정복지센터",tel:"정부24(gov.kr)",kw:["아동수당","수당","아동","아이","영유아"]},
+  {id:18,name:"부모급여 지원",type:"n",cat:"childcare",benefit:"0세 월 100만원 / 1세 월 50만원",target:"만 0~1세 아동 부모",desc:"어린이집 이용 여부와 관계없이 지원합니다.",dept:"주소지 행정복지센터",tel:"정부24(gov.kr)",kw:["부모급여","급여","영아","0세","1세","아기","육아"]},
+  {id:19,name:"가족돌봄수당",type:"l",cat:"childcare",benefit:"월 30만원",target:"2~3세 영유아를 둔 기준중위소득 150% 이하 가정 (월 40시간 이상 돌봄)",desc:"조부모 포함 4촌 이내 친족이 돌봄 수행 시 가족돌봄수당을 지급합니다. 2026년 신규.",dept:"여성가족과",tel:"041-521-5374",kw:["돌봄","수당","조부모","친족","육아","가족","천안"]},
+  {id:20,name:"아이돌봄 서비스",type:"n",cat:"childcare",benefit:"시간당 정부 지원 (소득기준 차등)",target:"만 12세 이하 자녀를 둔 가정",desc:"아이돌보미가 가정으로 찾아가 아이를 돌봐주는 서비스입니다.",dept:"여성가족과",tel:"041-521-5374",kw:["아이돌봄","돌보미","육아","맞벌이","직장맘"]},
+  {id:21,name:"초등 방과후 온종일 돌봄 (다함께돌봄센터)",type:"l",cat:"childcare",benefit:"방과후 돌봄 서비스",target:"초등학생 자녀를 둔 가정",desc:"관내 20개소 다함께돌봄센터 등 85개소에서 방과후 돌봄을 제공합니다.",dept:"아동보육과",tel:"041-521-2691",kw:["초등","방과후","돌봄","맞벌이","아이","천안"]},
+  {id:22,name:"자녀장려금 지원",type:"n",cat:"childcare",benefit:"1명당 최소 50만원~최대 100만원",target:"부양자녀(18세미만) 있는 총소득 7,000만원 미만 가구",desc:"5월에 국세청 홈택스 또는 세무서에 신청하면 지급됩니다.",dept:"국세청",tel:"1544-9944",kw:["자녀","장려금","세금","저소득","아동"]},
+  {id:23,name:"육아휴직급여 및 6+6 부모육아휴직제",type:"n",cat:"work",benefit:"1~3개월 상한 월 250만원 / 6+6제도 통상임금 100%(상한 250~450만원)",target:"만 12세 이하 자녀를 둔 근로자",desc:"부부가 함께 6개월씩 육아휴직 시 6+6 제도로 더 많은 급여를 받을 수 있습니다.",dept:"고용노동부",tel:"1350",kw:["육아휴직","휴직","급여","직장인","회사원","부모","맞벌이"]},
+  {id:24,name:"중소기업 근로자 복지기금 지원",type:"l",cat:"work",benefit:"연 100만원 지역사랑상품권 지급",target:"50인 이하 참여 중소기업 재직 근로자",desc:"복지기금을 통해 중소기업 근로자에게 복지비를 지급합니다.",dept:"충남북부상공회의소",tel:"041-559-5700",kw:["중소기업","직장인","근로자","복지","상품권","천안"]},
+  {id:25,name:"셋째자녀 이상 상·하수도 요금 감면",type:"l",cat:"multichildren",benefit:"50% 감면",target:"셋째 이상 자녀를 둔 천안시 가정",desc:"셋째 이상 자녀가 있는 가정의 수도요금을 50% 감면해드립니다.",dept:"맑은물사업본부",tel:"041-521-2011",kw:["다자녀","셋째","수도요금","천안","감면"]},
+  {id:26,name:"공용주차장 요금 감면 (다자녀 가정)",type:"l",cat:"multichildren",benefit:"2시간 무료주차 후 50% 감면",target:"자녀 2명 이상 세대 (막내 18세 이하, 천안시)",desc:"다자녀 가정 차량은 공용주차장에서 2시간 무료 주차 후 50% 감면 혜택을 받습니다.",dept:"천안도시공사",tel:"041-529-5120",kw:["다자녀","주차","감면","할인","둘째","천안"]},
+  {id:27,name:"충청남도 다자녀 행복키움 카드",type:"l",cat:"multichildren",benefit:"도내 다양한 시설 할인",target:"충남 거주 2자녀 이상 가정",desc:"충남 다자녀 행복키움 카드로 도내 여러 시설에서 할인 혜택을 받을 수 있습니다.",dept:"충청남도 여성가족과",tel:"041-635-4621",kw:["다자녀","카드","할인","충남","둘째"]},
+  {id:28,name:"다자녀 출산가구 전기요금 경감",type:"n",cat:"multichildren",benefit:"월 16,000원 할인",target:"자녀 3명 이상 또는 출산 가구",desc:"다자녀 또는 출산 가구의 전기요금을 매월 할인합니다.",dept:"한국전력공사",tel:"123",kw:["다자녀","전기요금","출산","할인","셋째"]},
+  {id:29,name:"다자녀 가정 도시가스 요금 경감",type:"n",cat:"multichildren",benefit:"최대 월 24,000원 할인",target:"3자녀 이상 가구",desc:"도시가스 요금을 매월 할인합니다.",dept:"지역 도시가스사",tel:"각 도시가스사 고객센터",kw:["다자녀","도시가스","할인","셋째"]},
+  {id:30,name:"다자녀 가정 자동차 취득세 감면",type:"n",cat:"multichildren",benefit:"3명 이상 시 취득세 면제 (최대 140~200만원)",target:"18세 미만 자녀 3명 이상 가정",desc:"다자녀 가정에서 자동차 구입 시 취득세를 면제받을 수 있습니다.",dept:"세무과",tel:"동남구 521-4162 / 서북구 521-6162",kw:["다자녀","자동차","취득세","감면","셋째"]},
+  {id:31,name:"다자녀 K패스 환급 지원",type:"n",cat:"multichildren",benefit:"2자녀 30% / 3자녀↑ 50% 대중교통비 환급",target:"2자녀 이상 K패스 카드 보유자",desc:"K패스 카드 사용 시 자녀 수에 따라 대중교통비를 환급받을 수 있습니다.",dept:"국토교통부",tel:"1599-0001",kw:["다자녀","K패스","교통","환급","둘째"]},
+  {id:32,name:"다자녀 가정 공항주차장 할인",type:"n",cat:"multichildren",benefit:"인천공항·전국 지방공항 50% 할인",target:"2명 이상 자녀 가정 (막내 18세 이하)",desc:"인천공항 및 전국 지방공항 주차장 50% 할인 혜택을 받습니다.",dept:"인천국제공항공사",tel:"1577-2600",kw:["다자녀","공항","주차","할인"]},
+  {id:33,name:"2자녀 이상 다자녀 가구 재산세 감면",type:"l",cat:"multichildren",benefit:"주택분 재산세 50% 감면",target:"2025년 이후 출생 자녀 2명 이상 천안시 가구",desc:"2025년 이후 출생한 자녀 2명 이상 다자녀 가구에 주택분 재산세를 50% 감면합니다.",dept:"세무과",tel:"동남구 521-4162 / 서북구 521-6162",kw:["다자녀","재산세","감면","둘째","천안"]},
+  {id:34,name:"신혼 신생아 전세임대주택 지원",type:"n",cat:"housing",benefit:"전세지원한도 9,500만원(I형)/13,000만원(II형), 임대료 1~2%",target:"저소득 신혼부부 및 예비신혼부부",desc:"LH가 전세계약 체결 후 재임대하는 방식으로 최장 20년 거주 가능합니다.",dept:"LH 한국토지주택공사",tel:"1600-1004",kw:["신혼","결혼","전세","임대주택","주거","저소득","LH"]},
+  {id:35,name:"생애최초 주택구입시 취득세 감면",type:"l",cat:"housing",benefit:"산출세액 200만원 이하 면제 / 200만원 초과시 200만원 공제",target:"생애최초 주택 취득자",desc:"처음으로 집을 구입하는 경우 취득세를 감면받습니다.",dept:"세무과",tel:"동남구 521-4162 / 서북구 521-6162",kw:["주택","집","구입","취득세","감면","생애최초","결혼","신혼"]},
+  {id:36,name:"출산·양육을 위한 주택구입시 취득세 감면",type:"l",cat:"housing",benefit:"자녀 수에 따라 취득세 감면",target:"자녀를 출산·입양한 가정",desc:"출산 및 육아를 위해 주택을 구입할 경우 취득세를 감면받습니다.",dept:"세무과",tel:"동남구 521-4162 / 서북구 521-6162",kw:["출산","주택","집","취득세","감면","자녀"]},
+  {id:37,name:"다자녀 매입임대주택",type:"n",cat:"housing",benefit:"시세 30~50% 수준 임대",target:"자녀 2명 이상 무주택 세대구성원",desc:"LH가 매입한 주택을 다자녀 가정에 시세보다 저렴하게 임대합니다.",dept:"LH 한국토지주택공사",tel:"1600-1004",kw:["다자녀","임대주택","주거","LH","둘째"]},
+  {id:38,name:"청년월세 지원사업",type:"n",cat:"housing",benefit:"월 최대 20만원 (최대 24개월)",target:"19~34세 무주택 청년 1인 가구 (소득기준 충족)",desc:"소득 기준을 충족하는 청년 1인 가구에게 월세를 최대 20만원씩 지원합니다.",dept:"청년정책과 청년지원팀",tel:"041-521-5505",kw:["청년","월세","주거","주거비","1인가구","집","임대"]},
+  {id:39,name:"청년주거급여 분리지급",type:"n",cat:"housing",benefit:"주거급여 분리 지급",target:"주거급여 수급 가구의 19~30세 미혼 청년 (부모와 별거)",desc:"주거급여 수급 가구의 청년이 부모와 별도로 거주 시 주거급여를 분리 지급받습니다.",dept:"주소지 행정복지센터",tel:"정부24(gov.kr)",kw:["청년","주거급여","주거","저소득","1인가구"]},
+  {id:40,name:"저소득 신혼부부 희망의 집짓기",type:"l",cat:"housing",benefit:"건축비 지원 (주택 공급)",target:"저소득 무주택 신혼부부",desc:"한국해비타트와 협력해 저소득 신혼부부에게 친환경 주택을 공급합니다.",dept:"복지정책과",tel:"041-521-2386",kw:["신혼","결혼","주거","주택","저소득","집","천안"]},
+  {id:41,name:"전입 1인가구 행복꾸러미 지원",type:"l",cat:"youth",benefit:"생필품 꾸러미 제공 (300명)",target:"관외 전입 후 6개월 이상 거주 중인 1인 가구 청년",desc:"타지역에서 천안으로 이사온 1인 가구 청년에게 새 주거 환경 적응을 돕는 생필품 꾸러미를 제공합니다.",dept:"청년정책과 청년지원팀",tel:"041-521-5505",kw:["전입","이사","1인가구","청년","천안","생필품","정착"]},
+  {id:42,name:"전입 1인가구 안심보안캠 지원",type:"l",cat:"youth",benefit:"안심보안캠(CCTV)·문열림센서·SOS 버튼 설치 (100명)",target:"관외 전입 후 6개월 이상 거주 중인 1인 가구 청년",desc:"타지역에서 천안으로 이사온 1인 가구 청년의 안전한 주거환경을 위해 보안캠과 센서를 무료 설치해드립니다.",dept:"청년정책과 청년지원팀",tel:"041-521-5505",kw:["전입","이사","1인가구","청년","보안","CCTV","안전","천안","정착"]},
+  {id:43,name:"1인가구 청년 랜덤프렌즈 동네친구 매칭",type:"l",cat:"youth",benefit:"동네 친구 매칭·커뮤니티 형성 지원 (80명)",target:"천안 관내 1인가구 청년",desc:"1인 가구 청년이 동네 친구를 사귈 수 있도록 매칭 프로그램을 운영합니다.",dept:"청년정책과 청년지원팀",tel:"041-521-5505",kw:["청년","1인가구","친구","커뮤니티","고립","천안"]},
+  {id:44,name:"청년 단기숙소 지원",type:"l",cat:"youth",benefit:"면접 시 1박 지원 / 취업 확정 시 최대 3개월 임시 거주",target:"관내 기업 면접 응시 또는 취업 확정 전입 청년",desc:"타지역 청년이 천안 기업 면접·취업 시 숙소를 지원해 지역 정착을 돕습니다.",dept:"청년정책과 청년지원팀",tel:"041-521-5506",kw:["청년","취업","면접","주거","숙소","천안","이사"]},
+  {id:45,name:"천안형 청년 재취업지원 프로그램",type:"l",cat:"youth",benefit:"심리 회복·직무역량·취업연계 통합 지원",target:"퇴사·경력단절 등 재취업 희망 청년",desc:"번아웃 청년 대상으로 심리정서 지원부터 취업연계까지 원스톱 지원합니다.",dept:"청년정책과 청년일자리팀",tel:"041-521-5503",kw:["청년","취업","재취업","경력단절","퇴사","번아웃","천안"]},
+  {id:46,name:"청년인턴 운영",type:"l",cat:"youth",benefit:"인건비 지원 (74명, 1인당 월 215만원)",target:"관내 미취업 청년",desc:"지역 우수 중견기업과 인턴십 연계 및 인건비를 지원합니다.",dept:"청년정책과 청년일자리팀",tel:"041-521-5503",kw:["청년","인턴","취업","일자리","천안"]},
+  {id:47,name:"청년 취업패키지·자격증 취득비 지원",type:"l",cat:"youth",benefit:"취업사진·면접정장·자격증 취득비 등 지원",target:"취업을 준비하는 천안 청년",desc:"취업사진 촬영, 면접정장 대여, 자격증 취득비 등 취업 준비 비용을 지원합니다.",dept:"청년정책과",tel:"041-521-2017",kw:["청년","취업","자격증","일자리","준비","천안","취업사진","면접"]},
+  {id:48,name:"청년버스운전자 양성과정",type:"l",cat:"youth",benefit:"1종 대형 면허·직무교육·취업연계 원스톱 (연 20명)",target:"1종 보통 면허 소지 20~39세 청년",desc:"1종대형면허 취득부터 버스운전자 양성, 취업연계까지 무료 지원합니다.",dept:"청년정책과",tel:"041-521-2017",kw:["청년","버스","운전","면허","취업","일자리","천안"]},
+  {id:49,name:"권역별 특화형 청년센터 이음",type:"l",cat:"youth",benefit:"취업 상담·문화활동·커뮤니티 공간",target:"천안 거주 청년 (18~39세)",desc:"권역별 청년센터에서 취업 상담, 문화활동, 커뮤니티 프로그램 등을 이용할 수 있습니다.",dept:"청년정책과",tel:"041-521-2018",kw:["청년","센터","상담","문화","커뮤니티","천안"]},
+  {id:50,name:"고립·은둔 청년 지원사업",type:"l",cat:"youth",benefit:"맞춤형 상담·프로그램 지원 (20명)",target:"고립·은둔 상태의 천안 청년",desc:"고립·은둔 청년을 발굴하고 맞춤형 프로그램으로 사회 참여와 자립을 돕습니다.",dept:"청년정책과 청년지원팀",tel:"041-521-5505",kw:["청년","고립","은둔","상담","우울","천안","1인가구"]},
+  {id:51,name:"청년 농업인 영농정착 지원",type:"l",cat:"youth",benefit:"월 110·100·90만원 (최대 3년) / 최대 5억 융자",target:"18~39세 독립경영 예정 또는 3년 이하 청년농업인",desc:"청년 농업인에게 영농정착지원금을 3년간 지급하고 융자를 지원합니다.",dept:"농업정책과",tel:"041-521-2381",kw:["청년","농업","귀농","농촌","정착","천안"]},
+  {id:52,name:"귀농인 창업 종합 지원",type:"l",cat:"youth",benefit:"영농기술 교육·창농 대출 저금리(2.0%)·정착 지원",target:"충남 정착 희망 만 18~45세 미만 청년",desc:"귀농 상담부터 영농기술 교육, 주택구입 저금리 대출, 정착 지원까지 원스톱으로 지원합니다.",dept:"농촌지원과",tel:"041-521-2964",kw:["귀농","귀촌","농촌","창농","천안","농업","정착"]},
+  {id:53,name:"노인일자리 및 사회활동 지원",type:"l",cat:"senior",benefit:"5,194명 공익활동·역량활용·취업지원",target:"천안 거주 노인",desc:"노인이 일자리·사회활동을 통해 건강하고 생산적인 노후생활을 할 수 있도록 지원합니다.",dept:"노인복지과",tel:"041-521-2432",kw:["노인","어르신","일자리","사회활동","복지","천안"]},
+  {id:54,name:"의료돌봄 통합지원",type:"l",cat:"senior",benefit:"보건의료·요양돌봄·주거재가서비스 통합 제공",target:"돌봄이 필요한 노인·장애인",desc:"노쇠·질병·장애로 돌봄이 필요한 시민에게 의료와 돌봄 서비스를 통합 제공합니다.",dept:"노인복지과",tel:"041-521-2432",kw:["노인","어르신","장애인","의료","돌봄","요양","천안"]},
+  {id:55,name:"경로당 부식비 지원",type:"l",cat:"senior",benefit:"부식비 지원",target:"천안시 경로당 이용 어르신",desc:"어르신들의 경로당 이용 편의와 식생활 개선을 위해 부식비를 지원합니다.",dept:"노인복지과",tel:"041-521-2432",kw:["노인","어르신","경로당","부식","복지","천안"]},
+  {id:56,name:"마음건강 심리상담 바우처",type:"l",cat:"welfare",benefit:"전문 심리상담 8회 이용 (64만원 이내)",target:"우울·불안 등 정서적 어려움이 있는 시민 (360명)",desc:"심리상담이 필요한 시민에게 전문 심리상담 서비스 바우처를 제공합니다.",dept:"보건소 정신건강팀",tel:"동남구 521-5335 / 서북구 521-5320",kw:["심리","상담","우울","불안","정신건강","바우처","천안"]},
+  {id:57,name:"1인가구 급식(밀키트) 지원",type:"l",cat:"welfare",benefit:"주 2회 밀키트 등 식료품 배송",target:"기초생활수급자 및 차상위계층 1인가구",desc:"저소득 1인가구에 주 2회 밀키트를 배송하며 안부확인 모니터링도 병행합니다.",dept:"복지정책과",tel:"041-521-3435",kw:["저소득","식품","밀키트","취약계층","독거","1인가구","천안"]},
+  {id:58,name:"주거취약계층 에너지 효율 개선 지원",type:"l",cat:"welfare",benefit:"단열 시공·절전 설비 지원 (100가구)",target:"쪽방·반지하 등 비정상거처 거주자 (중위소득 70% 이하)",desc:"주거취약계층 가정의 단열·에너지 효율 개선을 지원합니다.",dept:"복지정책과",tel:"041-521-2386",kw:["저소득","주거","에너지","취약계층","반지하","쪽방","천안"]},
+  {id:59,name:"저소득 아동·노인 치과 의료비 지원",type:"l",cat:"welfare",benefit:"아동 충치 최대 50만원 / 노인 임플란트 최대 300만원",target:"저소득층 아동 및 노인",desc:"저소득 가정 아동의 충치 치료비와 노인의 임플란트 비용을 지원합니다.",dept:"보건소",tel:"동남구 521-5035 / 서북구 521-5116",kw:["저소득","치과","임플란트","충치","의료비","아동","노인","천안"]},
+  {id:60,name:"소상공인 특례보증 확대",type:"l",cat:"welfare",benefit:"특례보증 지원",target:"천안 거주 소상공인",desc:"소상공인의 경영 안정과 재기를 위한 특례보증을 지원합니다.",dept:"일자리경제과",tel:"041-521-2341",kw:["소상공인","자영업","창업","대출","보증","천안"]},
+  {id:61,name:"한부모가족 자녀 양육비 지원",type:"n",cat:"welfare",benefit:"아동양육비·교육지원비 등 지급",target:"저소득 한부모가족",desc:"저소득 한부모가족의 생활안정과 복지증진을 위해 아동 양육비 등을 지원합니다.",dept:"여성가족과",tel:"041-521-2373",kw:["한부모","양육비","아동","저소득","복지","지원"]},
+  {id:62,name:"1인가구 생명사랑 행복키움",type:"l",cat:"welfare",benefit:"심리·정서 프로그램·캠페인 지원",target:"천안시 서북구 1인가구 (자살 고위험군 발굴·지원)",desc:"1인 가구 중 자살 고위험군을 조기 발굴하고 맞춤형 프로그램으로 자살 예방과 자립을 지원합니다.",dept:"보건소 정신건강팀",tel:"서북구 521-5320",kw:["1인가구","고독","고립","우울","자살예방","천안","심리"]},
+  {id:63,name:"청년도전지원사업",type:"n",cat:"youth",benefit:"단기(5주) 최대 50만원 / 중기(15주) 최대 220만원 / 장기(25주) 최대 350만원 참여수당",target:"천안 거주 18~39세 청년 중 6개월 이상 취업·교육·훈련 이력 없는 청년 (260명)",desc:"장기 미취업 청년의 사회 진입과 자립을 돕는 심리 회복·진로 탐색·취업 역량 강화 프로그램입니다.",dept:"청년정책과",tel:"041-521-2017",kw:["청년","취업","미취업","구직","자립","도전","천안"]},
+  {id:64,name:"대학생 행복기숙사 지원",type:"l",cat:"youth",benefit:"수도권 기숙사 월 10만원 / 천안 기숙사 월 5만원",target:"천안시 1년 이상 거주 대학 재학생 (수도권·천안 소재)",desc:"수도권 대학 재학 천안 출신 학생 또는 천안 소재 대학 재학생에게 기숙사비를 지원합니다.",dept:"청년정책과 청년지원팀",tel:"041-521-3703",kw:["대학생","기숙사","주거","학생","천안","학비"]},
+  {id:65,name:"수도권 광역전철-천안시내버스 환승할인",type:"l",cat:"youth",benefit:"광역전철 하차 후 시내버스 환승 시 요금 할인",target:"천안 거주 광역전철 이용 시민",desc:"수도권 광역전철에서 천안 시내버스로 환승 시 추가 요금 부담 없이 이용할 수 있습니다.",dept:"대중교통과",tel:"041-521-2052",kw:["교통","전철","버스","환승","할인","천안","수도권"]},
+  {id:66,name:"자립준비청년 자립수당",type:"n",cat:"youth",benefit:"월 50만원 (최대 60개월)",target:"아동복지시설·위탁가정 보호종료 후 5년 이내 자립준비청년",desc:"보호 종료 후 사회에 첫발을 내딛는 자립준비청년에게 자립수당을 지급합니다.",dept:"아동보육과",tel:"041-521-2692",kw:["청년","자립","보호종료","복지","수당","취약청년"]},
+  {id:67,name:"자립준비청년 자립정착금",type:"l",cat:"youth",benefit:"최대 1,500만원",target:"아동복지시설·위탁가정 보호종료 자립준비청년",desc:"자립 시 초기 정착에 필요한 자립정착금을 지원합니다.",dept:"아동보육과",tel:"041-521-2692",kw:["청년","자립","보호종료","정착금","복지","취약청년"]},
+  {id:68,name:"청년문화예술패스",type:"l",cat:"youth",benefit:"연 20만원 문화예술 관람 지원",target:"19~20세 천안시 청년",desc:"19~20세 청년에게 연 20만원 상당의 문화예술 관람 지원금을 제공합니다.",dept:"문화예술과",tel:"041-521-2765",kw:["청년","문화","예술","공연","관람","19세","20세","문화예술패스"]},
+  {id:69,name:"배워유 자기계발프로그램",type:"l",cat:"youth",benefit:"공예·운동·식음료·미디어 등 취미·여가 프로그램 지원",target:"천안시 청년 누구나",desc:"청년 창업자가 운영하는 취미·여가 관련 수업을 저렴하게 이용할 수 있는 프로그램입니다.",dept:"청년정책과 청년지원팀",tel:"041-521-5505",kw:["청년","자기계발","취미","여가","문화","배워유","교육","천안"]},
+];
+
+const catLabel={pregnancy:"임신·출산",birth:"출산장려",childcare:"보육·육아",multichildren:"다자녀",housing:"주거지원",work:"일·가정",youth:"청년",senior:"어르신",welfare:"복지·생활"};
+const catCls={pregnancy:"b-pregnancy",birth:"b-birth",childcare:"b-childcare",multichildren:"b-multichildren",housing:"b-housing",work:"b-work",youth:"b-youth",senior:"b-senior",welfare:"b-welfare"};
+const SYNONYM={"결혼":"신혼","신혼":"결혼","아이":"아동","자녀":"아동","직장":"회사","회사":"직장","집":"주택","월세":"주거","전세":"주거","노인":"어르신","어르신":"노인","취준":"취업","취준생":"청년","셋째":"다자녀","다자녀":"셋째","부부":"결혼","산후":"출산","이사":"전입","전입":"이사","귀농":"귀촌","귀촌":"귀농","혼자":"1인가구","혜택":"지원","지원금":"지원","보조금":"지원"};
+
+function tokenize(text){
+  const tokens=new Set();
+  const words=text.replace(/[^\uAC00-\uD7A3a-zA-Z0-9+]/g,' ').split(/\s+/).filter(w=>w.length>1);
+  words.forEach(w=>{tokens.add(w);if(SYNONYM[w])tokens.add(SYNONYM[w]);});
+  const m=text.match(/(\d+)\s*세|(\d+)\s*살/);
+  if(m){const age=parseInt(m[1]||m[2]);if(age>=18&&age<=39)tokens.add('청년');if(age>=65){tokens.add('노인');tokens.add('어르신');}if(age>=20&&age<=45)tokens.add('결혼');}
+  if(text.includes('1인')&&(text.includes('가구')||text.includes('혼자')))tokens.add('1인가구');
+  if(text.includes('전입')||text.includes('이사'))tokens.add('전입');
+  return tokens;
+}
+function score(p,tokens){let s=0;tokens.forEach(t=>{p.kw.forEach(k=>{if(k===t)s+=3;else if(k.includes(t)||t.includes(k))s+=1;});});return s;}
+function greetingFor(tokens){
+  if(tokens.has('전입')||tokens.has('이사'))return '천안으로 이사 오신 분을 위한 정책이에요!';
+  if(tokens.has('임신')||tokens.has('임산부'))return '임신·출산 관련 정책을 찾아드렸어요.';
+  if(tokens.has('결혼')||tokens.has('신혼'))return '결혼·신혼 관련 정책을 찾아드렸어요.';
+  if(tokens.has('청년')||tokens.has('취업'))return '청년 지원 정책을 찾아드렸어요.';
+  if(tokens.has('노인')||tokens.has('어르신'))return '어르신 복지 정책을 찾아드렸어요.';
+  if(tokens.has('다자녀')||tokens.has('셋째'))return '다자녀 가정 혜택을 찾아드렸어요.';
+  if(tokens.has('귀농')||tokens.has('귀촌'))return '귀농·귀촌 지원 정책을 찾아드렸어요.';
+  if(tokens.has('육아휴직')||tokens.has('보육'))return '육아·보육 관련 정책을 찾아드렸어요.';
+  if(tokens.has('1인가구'))return '1인 가구를 위한 정책을 찾아드렸어요.';
+  return '관련 정책을 찾아드렸어요.';
+}
+
+const chatArea=document.getElementById('chat-area');
+const input=document.getElementById('user-input');
+function fill(t){input.value=t;input.style.height='auto';input.focus();}
+input.addEventListener('keydown',e=>{if(e.key==='Enter'&&!e.shiftKey){e.preventDefault();send();}});
+input.addEventListener('input',()=>{input.style.height='auto';input.style.height=Math.min(input.scrollHeight,120)+'px';});
+
+function addBubble(html,cls){
+  const d=document.createElement('div');d.className=cls;d.innerHTML=html;
+  chatArea.appendChild(d);
+  setTimeout(()=>d.scrollIntoView({behavior:'smooth',block:'nearest'}),50);
+}
+
+function send(){
+  const q=input.value.trim();if(!q)return;
+  input.value='';input.style.height='auto';
+  addBubble(q,'bubble-user');
+  const tokens=tokenize(q);
+  const scored=POLICIES.map(p=>({p,s:score(p,tokens)})).filter(x=>x.s>0).sort((a,b)=>b.s-a.s).slice(0,6);
+  if(!scored.length){
+    addBubble('관련 정책을 찾지 못했어요.<br><span class="hint">예: "천안 전입 청년" / "임신 출산" / "다자녀 혜택"</span>','bubble-bot');
+    return;
+  }
+  let html=`<div class="greeting">${greetingFor(tokens)}</div><div class="result-label">${scored.length}개 정책을 찾았어요</div><div class="p-cards">`;
+  scored.forEach(({p})=>{
+    const cl=catCls[p.cat]||'b-n';const lb=catLabel[p.cat]||p.cat;
+    html+=`<div class="p-card">
+      <div class="p-card-head">
+        <span class="badge ${p.type==='n'?'b-n':'b-l'}">${p.type==='n'?'국가':'지자체'}</span>
+        <span class="badge ${cl}">${lb}</span>
+        <span class="p-name">${p.name}</span>
+      </div>
+      <div class="p-desc">${p.desc}</div>
+      <div class="p-meta">
+        <span><strong>혜택</strong> ${p.benefit}</span>
+        <span><strong>대상</strong> ${p.target}</span>
+      </div>
+      <div class="p-contact"><strong>문의</strong> ${p.dept} · ${p.tel}</div>
+    </div>`;
+  });
+  html+=`</div><div class="tip">자세한 신청 방법은 주소지 행정복지센터 또는 정부24(gov.kr)에서 확인하세요.</div>`;
+  addBubble(html,'bubble-bot');
+}
+</script>
+</body>
+</html>
