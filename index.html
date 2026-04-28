@@ -2,7 +2,7 @@
 <html lang="ko">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, interactive-widget=resizes-content">
 <title>천안시 인구정책 찾기</title>
 <style>
   :root {
@@ -92,7 +92,9 @@
   .input-wrap {
     position: fixed; bottom: 0; left: 0; right: 0;
     background: var(--white); border-top: 1px solid var(--border);
-    padding: 10px 16px; z-index: 100;
+    padding: 10px 16px 10px;
+    padding-bottom: calc(10px + env(safe-area-inset-bottom));
+    z-index: 100;
   }
   .input-inner { display: flex; gap: 8px; align-items: flex-end; }
   #user-input {
@@ -104,15 +106,19 @@
   }
   #user-input:focus { border-color: var(--primary); background: var(--white); }
   #send-btn {
-    height: 44px; padding: 0 18px; border-radius: 12px; border: none;
-    background: var(--primary); color: white; font-size: 14px; font-weight: 500;
+    height: 44px; padding: 0 20px; border-radius: 12px; border: none;
+    background: var(--primary); color: white; font-size: 15px; font-weight: 700;
     cursor: pointer; font-family: inherit; white-space: nowrap; transition: opacity 0.15s; flex-shrink: 0;
+    -webkit-tap-highlight-color: transparent; touch-action: manipulation;
   }
   #send-btn:active { opacity: 0.85; }
   @media (max-width: 480px) {
     .bubble-bot, .bubble-user { max-width: 95%; }
-    #user-input { font-size: 12px; letter-spacing: -0.04em; padding: 10px 10px; }
-    #user-input::placeholder { font-size: 12px; letter-spacing: -0.04em; }
+    #user-input { font-size: 13px; letter-spacing: -0.04em; padding: 10px 10px; }
+    #user-input::placeholder { font-size: 13px; letter-spacing: -0.04em; }
+    #send-btn { height: 44px; padding: 0 16px; font-size: 14px; border-radius: 10px; }
+    .input-wrap { padding: 8px 12px; padding-bottom: calc(8px + env(safe-area-inset-bottom)); }
+    .chip { font-size: 12px; padding: 6px 12px; }
   }
   .card-links { margin-top: 8px; padding-top: 8px; border-top: 1px dashed #e8eef8; display: flex; flex-direction: column; gap: 4px; }
   .card-link-item { display: flex; align-items: center; gap: 6px; font-size: 12px; }
@@ -160,7 +166,7 @@
 
 <div class="input-wrap">
   <div class="input-inner">
-    <textarea id="user-input" rows="1" placeholder="키워드로 검색 (예: 임신, 취업, 초등돌봄)"></textarea>
+    <textarea id="user-input" rows="1" placeholder="키워드로 검색 (예: 임신, 취업, 초등돌봄)" enterkeyhint="search"></textarea>
     <button id="send-btn" onclick="send()">검색 ↗</button>
   </div>
 </div>
@@ -1368,6 +1374,11 @@ function send() {
   if(!q) return;
   inp.value = '';
   addBubble('user', q);
+  // 모바일 키보드 올라올 때 스크롤
+  setTimeout(() => {
+    const area = document.getElementById('chat-area');
+    if(area) area.scrollTop = area.scrollHeight;
+  }, 100);
   const results = search(q);
   setTimeout(() => {
     // 돌봄 의도 감지 (아이충남 안내 대상)
