@@ -100,7 +100,7 @@
     padding: 10px 14px; font-size: 14px; font-family: inherit;
     color: var(--text-main); background: var(--bg);
     min-height: 44px; max-height: 120px; line-height: 1.5;
-    outline: none; resize: none; transition: border-color 0.15s;
+    outline: none; resize: none; letter-spacing: -0.03em; transition: border-color 0.15s;
   }
   #user-input:focus { border-color: var(--primary); background: var(--white); }
   #send-btn {
@@ -109,7 +109,11 @@
     cursor: pointer; font-family: inherit; white-space: nowrap; transition: opacity 0.15s; flex-shrink: 0;
   }
   #send-btn:active { opacity: 0.85; }
-  @media (max-width: 480px) { .bubble-bot, .bubble-user { max-width: 95%; } }
+  @media (max-width: 480px) {
+    .bubble-bot, .bubble-user { max-width: 95%; }
+    #user-input { font-size: 12px; letter-spacing: -0.04em; padding: 10px 10px; }
+    #user-input::placeholder { font-size: 12px; letter-spacing: -0.04em; }
+  }
   .card-links { margin-top: 8px; padding-top: 8px; border-top: 1px dashed #e8eef8; display: flex; flex-direction: column; gap: 4px; }
   .card-link-item { display: flex; align-items: center; gap: 6px; font-size: 12px; }
   .card-link-item a { color: #1a73e8; text-decoration: none; font-weight: 500; }
@@ -156,7 +160,7 @@
 
 <div class="input-wrap">
   <div class="input-inner">
-    <textarea id="user-input" rows="1" placeholder="키워드로 검색하세요 (예: 임신, 취업, 초등 돌봄)"></textarea>
+    <textarea id="user-input" rows="1" placeholder="키워드로 검색 (예: 임신, 취업, 초등돌봄)"></textarea>
     <button id="send-btn" onclick="send()">검색 ↗</button>
   </div>
 </div>
@@ -1191,7 +1195,7 @@ const POLICIES = [
  benefit:"맞춤형 주택 개보수 지원",
  target:"65세 이상 노인 거주 가구 (80세 이상 우선 지원)",
  desc:"고령자의 안전하고 편리한 주거생활을 위한 주택 개보수를 지원합니다.\n• 안전손잡이·문턱 제거·욕실 개선 등\n• 신청: 주소지 읍면동 행정복지센터",
- dept:"주거복지과",tel:"041-521-5625",
+ dept:"복지정책과 (주거복지팀)",tel:"041-521-5625",
  kw:["노인주거","주택개선","어르신","주거환경","집수리","노인","65세","주거지원"]},
 
 // ─ 교통 추가 ─
