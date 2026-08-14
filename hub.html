@@ -1,0 +1,777 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>천안시 AI 에이전트 공유 허브</title>
+<style>
+  :root {
+    --primary: #1a73e8;
+    --primary-dark: #0d47a1;
+    --primary-light: #e8f0fe;
+    --bg: #f5f7fa;
+    --white: #fff;
+    --text-main: #1a1a2e;
+    --text-sub: #666;
+    --text-mute: #9aa0a6;
+    --border: #e6e8eb;
+    --shadow: 0 2px 12px rgba(0,0,0,0.08);
+    --shadow-lg: 0 8px 30px rgba(0,0,0,0.12);
+    --radius: 16px;
+    --like: #e0245e;
+    --ok: #1e8e3e;
+    --warn: #f9ab00;
+  }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  html, body { scroll-behavior: smooth; }
+  body {
+    font-family: 'Apple SD Gothic Neo', 'Malgun Gothic', -apple-system, sans-serif;
+    background: var(--bg); color: var(--text-main); min-height: 100vh;
+    line-height: 1.55; letter-spacing: -0.2px;
+  }
+  a { color: inherit; text-decoration: none; }
+  button { font-family: inherit; cursor: pointer; border: none; background: none; }
+
+  /* ---------- Header ---------- */
+  .header {
+    background: linear-gradient(135deg, var(--primary), var(--primary-dark));
+    color: #fff; padding: 26px 20px 30px;
+    position: relative; overflow: hidden;
+  }
+  .header::after {
+    content: ""; position: absolute; right: -60px; top: -60px;
+    width: 220px; height: 220px; border-radius: 50%;
+    background: rgba(255,255,255,0.08);
+  }
+  .header-inner { max-width: 1120px; margin: 0 auto; position: relative; z-index: 1; }
+  .brand-pill {
+    display: inline-flex; align-items: center; gap: 7px;
+    background: rgba(255,255,255,0.18); backdrop-filter: blur(6px);
+    padding: 5px 14px; border-radius: 50px; font-size: 12.5px; font-weight: 700;
+    margin-bottom: 14px;
+  }
+  .header h1 { font-size: 26px; font-weight: 800; letter-spacing: -0.6px; }
+  .header p { font-size: 14px; opacity: 0.92; margin-top: 8px; max-width: 640px; }
+
+  .stats { display: flex; gap: 10px; margin-top: 20px; flex-wrap: wrap; }
+  .stat {
+    background: rgba(255,255,255,0.14); border: 1px solid rgba(255,255,255,0.22);
+    border-radius: 14px; padding: 12px 18px; min-width: 92px;
+  }
+  .stat b { font-size: 22px; font-weight: 800; display: block; }
+  .stat span { font-size: 12px; opacity: 0.9; }
+
+  /* ---------- Layout ---------- */
+  .wrap { max-width: 1120px; margin: 0 auto; padding: 22px 20px 80px; }
+
+  .mode-banner {
+    display: flex; align-items: center; gap: 10px;
+    background: #fff8e1; border: 1px solid #ffe082; color: #7a5900;
+    border-radius: 12px; padding: 10px 14px; font-size: 13px; margin-bottom: 18px;
+  }
+  .mode-banner.live { background: #e6f4ea; border-color: #a8dab5; color: #14652a; }
+  .mode-banner b { font-weight: 800; }
+  .mode-banner button { margin-left: auto; font-size: 12px; color: inherit; text-decoration: underline; opacity: 0.8; }
+
+  /* ---------- Toolbar ---------- */
+  .toolbar { display: flex; gap: 10px; flex-wrap: wrap; align-items: center; margin-bottom: 18px; }
+  .search-box {
+    flex: 1; min-width: 220px; display: flex; align-items: center; gap: 8px;
+    background: var(--white); border: 1px solid var(--border); border-radius: 50px;
+    padding: 10px 16px; box-shadow: var(--shadow);
+  }
+  .search-box input { border: none; outline: none; flex: 1; font-size: 14px; background: transparent; color: var(--text-main); }
+  .search-box svg { flex-shrink: 0; }
+  .sort-select {
+    background: var(--white); border: 1px solid var(--border); border-radius: 50px;
+    padding: 10px 16px; font-size: 13.5px; font-weight: 600; color: var(--text-main);
+    box-shadow: var(--shadow); outline: none;
+  }
+  .btn-primary {
+    background: linear-gradient(135deg, var(--primary), var(--primary-dark)); color: #fff;
+    border-radius: 50px; padding: 11px 20px; font-size: 14px; font-weight: 700;
+    box-shadow: 0 4px 14px rgba(26,115,232,0.35); display: inline-flex; align-items: center; gap: 7px;
+    transition: transform .12s ease, box-shadow .12s ease;
+  }
+  .btn-primary:active { transform: scale(0.97); }
+
+  .chips { display: flex; gap: 8px; flex-wrap: wrap; margin-bottom: 22px; }
+  .chip {
+    background: var(--white); border: 1px solid var(--border); color: var(--text-sub);
+    border-radius: 50px; padding: 7px 15px; font-size: 13px; font-weight: 600; transition: all .12s ease;
+  }
+  .chip.active { background: var(--primary); border-color: var(--primary); color: #fff; box-shadow: 0 3px 10px rgba(26,115,232,0.3); }
+
+  /* ---------- Grid ---------- */
+  .grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(300px, 1fr)); gap: 16px; }
+  .card {
+    background: var(--white); border: 1px solid var(--border); border-radius: var(--radius);
+    box-shadow: var(--shadow); overflow: hidden; display: flex; flex-direction: column;
+    transition: transform .15s ease, box-shadow .15s ease; position: relative;
+  }
+  .card:hover { transform: translateY(-3px); box-shadow: var(--shadow-lg); }
+  .card-top { padding: 18px 18px 0; display: flex; gap: 13px; align-items: flex-start; }
+  .card-icon {
+    width: 52px; height: 52px; border-radius: 14px; flex-shrink: 0;
+    display: flex; align-items: center; justify-content: center; font-size: 27px;
+    background: var(--primary-light);
+  }
+  .card-titles { flex: 1; min-width: 0; }
+  .card-title { font-size: 16.5px; font-weight: 800; letter-spacing: -0.4px; }
+  .card-dept { font-size: 12.5px; color: var(--text-sub); margin-top: 3px; display: flex; align-items: center; gap: 5px; }
+  .badges { display: flex; gap: 6px; flex-wrap: wrap; padding: 12px 18px 0; }
+  .badge { font-size: 11px; font-weight: 700; padding: 3px 9px; border-radius: 50px; }
+  .badge-cat { background: var(--primary-light); color: var(--primary-dark); }
+  .badge-example { background: #f1f3f4; color: #5f6368; }
+  .badge-pending { background: #fef7e0; color: #7a5900; }
+  .badge-new { background: #e6f4ea; color: var(--ok); }
+  .card-desc { padding: 12px 18px; font-size: 13.5px; color: var(--text-sub); flex: 1; }
+  .card-foot {
+    border-top: 1px solid var(--border); padding: 12px 18px;
+    display: flex; align-items: center; gap: 8px;
+  }
+  .like-btn {
+    display: inline-flex; align-items: center; gap: 6px; font-size: 14px; font-weight: 700;
+    color: var(--text-sub); padding: 6px 12px; border-radius: 50px; border: 1px solid var(--border);
+    transition: all .12s ease;
+  }
+  .like-btn.liked { color: var(--like); border-color: #f7c0d0; background: #fdeef3; }
+  .like-btn:active { transform: scale(0.92); }
+  .comment-btn {
+    display: inline-flex; align-items: center; gap: 6px; font-size: 13.5px; font-weight: 600;
+    color: var(--text-sub); padding: 6px 12px; border-radius: 50px; border: 1px solid var(--border);
+  }
+  .try-btn {
+    margin-left: auto; background: var(--primary); color: #fff; font-size: 13.5px; font-weight: 700;
+    padding: 8px 16px; border-radius: 50px; display: inline-flex; align-items: center; gap: 5px;
+  }
+  .try-btn.disabled { background: #c3c8ce; cursor: default; }
+
+  .empty { text-align: center; color: var(--text-mute); padding: 60px 20px; font-size: 15px; }
+
+  /* ---------- Section titles ---------- */
+  .section-title { font-size: 18px; font-weight: 800; margin: 30px 0 14px; display: flex; align-items: center; gap: 8px; }
+  .section-title small { font-size: 13px; font-weight: 600; color: var(--text-mute); }
+
+  /* ---------- Modal ---------- */
+  .modal-back {
+    position: fixed; inset: 0; background: rgba(0,0,0,0.45); z-index: 1000;
+    display: none; align-items: flex-end; justify-content: center;
+  }
+  .modal-back.open { display: flex; }
+  @media (min-width: 640px) { .modal-back.open { align-items: center; } }
+  .modal {
+    background: var(--white); width: 100%; max-width: 560px; max-height: 90vh;
+    border-radius: 22px 22px 0 0; overflow-y: auto; box-shadow: var(--shadow-lg);
+    animation: slideUp .22s ease;
+  }
+  @media (min-width: 640px) { .modal { border-radius: 22px; } }
+  @keyframes slideUp { from { transform: translateY(40px); opacity: 0; } to { transform: translateY(0); opacity: 1; } }
+  .modal-head { position: sticky; top: 0; background: var(--white); padding: 20px 22px 14px; border-bottom: 1px solid var(--border); display: flex; gap: 12px; align-items: flex-start; }
+  .modal-head .card-icon { width: 46px; height: 46px; font-size: 24px; }
+  .modal-close { margin-left: auto; font-size: 22px; color: var(--text-mute); line-height: 1; padding: 4px; }
+  .modal-body { padding: 18px 22px 24px; }
+  .modal-desc { font-size: 14px; color: var(--text-sub); margin-bottom: 16px; }
+  .modal-actions { display: flex; gap: 8px; margin-bottom: 20px; }
+
+  .comments-title { font-size: 14px; font-weight: 800; margin: 6px 0 12px; }
+  .comment {
+    padding: 12px 14px; background: var(--bg); border-radius: 12px; margin-bottom: 8px;
+  }
+  .comment-meta { font-size: 12px; color: var(--text-mute); margin-bottom: 4px; display: flex; gap: 8px; }
+  .comment-meta b { color: var(--text-main); font-weight: 700; }
+  .comment-text { font-size: 13.5px; color: var(--text-main); white-space: pre-wrap; word-break: break-word; }
+  .comment-form { margin-top: 12px; }
+  .comment-form .row { display: flex; gap: 8px; margin-bottom: 8px; }
+  .field {
+    width: 100%; border: 1px solid var(--border); border-radius: 12px; padding: 11px 14px;
+    font-size: 14px; font-family: inherit; outline: none; background: var(--white); color: var(--text-main);
+  }
+  .field:focus { border-color: var(--primary); box-shadow: 0 0 0 3px var(--primary-light); }
+  textarea.field { resize: vertical; min-height: 74px; }
+  .field-name { max-width: 160px; }
+  .btn-send { background: var(--primary); color: #fff; border-radius: 12px; padding: 11px 20px; font-size: 14px; font-weight: 700; align-self: flex-start; }
+
+  /* ---------- Submit form specifics ---------- */
+  .form-label { font-size: 13px; font-weight: 700; margin: 14px 0 6px; display: block; }
+  .form-hint { font-size: 12px; color: var(--text-mute); margin-top: 4px; }
+  .icon-picker { display: flex; gap: 6px; flex-wrap: wrap; margin-top: 4px; }
+  .icon-opt { width: 40px; height: 40px; border-radius: 11px; background: var(--bg); font-size: 20px; display: flex; align-items: center; justify-content: center; border: 2px solid transparent; }
+  .icon-opt.sel { border-color: var(--primary); background: var(--primary-light); }
+
+  .toast {
+    position: fixed; bottom: 26px; left: 50%; transform: translateX(-50%) translateY(20px);
+    background: #1a1a2e; color: #fff; padding: 13px 22px; border-radius: 50px; font-size: 14px; font-weight: 600;
+    opacity: 0; pointer-events: none; transition: all .25s ease; z-index: 2000; box-shadow: var(--shadow-lg);
+  }
+  .toast.show { opacity: 1; transform: translateX(-50%) translateY(0); }
+
+  .footer { text-align: center; color: var(--text-mute); font-size: 12.5px; padding: 30px 20px 0; }
+  .footer a { color: var(--primary); font-weight: 600; }
+</style>
+</head>
+<body>
+
+<header class="header">
+  <div class="header-inner">
+    <div class="brand-pill">🏛️ 천안시 · AI 행정혁신</div>
+    <h1>AI 에이전트 공유 허브</h1>
+    <p>직원들이 바이브코딩으로 직접 만든 업무 에이전트를 한곳에서 둘러보고, 좋아요와 의견으로 호응을 남겨보세요. 반응이 좋은 도구는 함께 고도화합니다.</p>
+    <div class="stats">
+      <div class="stat"><b id="stat-agents">0</b><span>등록 에이전트</span></div>
+      <div class="stat"><b id="stat-likes">0</b><span>누적 좋아요</span></div>
+      <div class="stat"><b id="stat-depts">0</b><span>참여 부서</span></div>
+    </div>
+  </div>
+</header>
+
+<div class="wrap">
+
+  <div id="mode-banner" class="mode-banner">
+    <span>⏳ 백엔드 연결 확인 중…</span>
+  </div>
+
+  <div class="toolbar">
+    <div class="search-box">
+      <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#9aa0a6" stroke-width="2"><circle cx="11" cy="11" r="7"/><path d="M21 21l-4-4"/></svg>
+      <input id="search" type="text" placeholder="에이전트 이름·부서·기능 검색…">
+    </div>
+    <select id="sort" class="sort-select">
+      <option value="popular">인기순</option>
+      <option value="recent">최신순</option>
+      <option value="comments">댓글순</option>
+    </select>
+    <button class="btn-primary" onclick="openSubmit()">
+      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2.4"><path d="M12 5v14M5 12h14"/></svg>
+      내 에이전트 등록
+    </button>
+  </div>
+
+  <div id="chips" class="chips"></div>
+
+  <div id="grid" class="grid"></div>
+  <div id="empty" class="empty" style="display:none">🔍 조건에 맞는 에이전트가 없어요.</div>
+
+  <div class="footer">
+    천안시 AI 행정혁신 · 직원 에이전트 공유 허브 &nbsp;|&nbsp;
+    <a href="./index.html">대표 사례: 인구정책 찾기 →</a>
+  </div>
+</div>
+
+<!-- ===== Detail / Comments Modal ===== -->
+<div class="modal-back" id="detail-modal" onclick="if(event.target===this)closeModal('detail-modal')">
+  <div class="modal">
+    <div class="modal-head">
+      <div class="card-icon" id="d-icon">🤖</div>
+      <div style="flex:1;min-width:0">
+        <div class="card-title" id="d-title"></div>
+        <div class="card-dept" id="d-dept"></div>
+      </div>
+      <button class="modal-close" onclick="closeModal('detail-modal')">✕</button>
+    </div>
+    <div class="modal-body">
+      <div class="modal-desc" id="d-desc"></div>
+      <div class="modal-actions">
+        <button class="like-btn" id="d-like" onclick="toggleLikeCurrent()">🤍 <span id="d-like-count">0</span></button>
+        <a class="try-btn" id="d-try" target="_blank">체험하기 →</a>
+      </div>
+      <div class="comments-title">💬 의견 <span id="d-comment-count">0</span></div>
+      <div id="d-comments"></div>
+      <div class="comment-form">
+        <div class="row">
+          <input class="field field-name" id="c-name" placeholder="이름/부서" maxlength="20">
+        </div>
+        <textarea class="field" id="c-text" placeholder="이 에이전트에 대한 의견이나 개선 아이디어를 남겨주세요" maxlength="500"></textarea>
+        <div style="margin-top:8px"><button class="btn-send" onclick="submitComment()">의견 남기기</button></div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ===== Submit Modal ===== -->
+<div class="modal-back" id="submit-modal" onclick="if(event.target===this)closeModal('submit-modal')">
+  <div class="modal">
+    <div class="modal-head">
+      <div class="card-icon">✨</div>
+      <div style="flex:1"><div class="card-title">내 에이전트 등록 신청</div><div class="card-dept">동료들과 공유할 도구를 소개해주세요</div></div>
+      <button class="modal-close" onclick="closeModal('submit-modal')">✕</button>
+    </div>
+    <div class="modal-body">
+      <label class="form-label">에이전트 이름 *</label>
+      <input class="field" id="s-name" placeholder="예: 회의록 자동 요약 봇" maxlength="40">
+
+      <label class="form-label">담당자 / 부서 *</label>
+      <input class="field" id="s-dept" placeholder="예: 행정지원과 홍길동" maxlength="30">
+
+      <label class="form-label">분류</label>
+      <select class="field" id="s-cat"></select>
+
+      <label class="form-label">한 줄 소개 *</label>
+      <textarea class="field" id="s-desc" placeholder="어떤 업무를 어떻게 개선하나요? 무엇을 입력하면 무엇이 나오는지 알려주세요." maxlength="300"></textarea>
+
+      <label class="form-label">체험 링크 (선택)</label>
+      <input class="field" id="s-link" placeholder="https:// 배포 주소가 있다면 입력">
+      <div class="form-hint">아직 링크가 없어도 됩니다. 담당자가 확인 후 정식 등록해 드립니다.</div>
+
+      <label class="form-label">아이콘</label>
+      <div class="icon-picker" id="s-icons"></div>
+
+      <div style="margin-top:22px"><button class="btn-send" style="width:100%;padding:14px" onclick="submitAgent()">등록 신청하기</button></div>
+    </div>
+  </div>
+</div>
+
+<div class="toast" id="toast"></div>
+
+<script type="module">
+/* =========================================================================
+   천안시 AI 에이전트 공유 허브
+   -------------------------------------------------------------------------
+   ■ 백엔드 설정 (실시간 공유 좋아요/댓글을 켜려면)
+     아래 FIREBASE_CONFIG 에 파이어베이스 프로젝트 설정값을 붙여넣으세요.
+     설정 방법은 저장소의 README.md 를 참고하세요.
+     비워두면 '데모 모드'로 동작합니다 (좋아요/댓글이 내 브라우저에만 저장).
+   ========================================================================= */
+const FIREBASE_CONFIG = {
+  // apiKey: "...",
+  // authDomain: "....firebaseapp.com",
+  // projectId: "...",
+  // storageBucket: "....appspot.com",
+  // messagingSenderId: "...",
+  // appId: "..."
+};
+
+/* ---------------- 카테고리 ---------------- */
+const CATEGORIES = ["전체", "민원·정책안내", "문서작성", "홍보", "데이터·통계", "내부업무", "기타"];
+
+/* ---------------- 씨앗(기본) 에이전트 ----------------
+   담당자는 이 배열만 편집하면 대표 에이전트를 추가/수정할 수 있습니다.
+   type: 'official' 정식 | 'example' 예시(체험 링크 없음)
+------------------------------------------------------ */
+const SEED_AGENTS = [
+  {
+    id: "population-finder",
+    type: "official",
+    icon: "👶",
+    title: "천안시 인구정책 찾기",
+    dept: "인구정책과",
+    category: "민원·정책안내",
+    desc: "질문을 입력하면 임신·출산·육아·청년·어르신 등 상황에 맞는 천안시 및 국가 지원정책을 대화형으로 찾아 안내합니다. 실제 배포되어 사용 중인 대표 사례입니다.",
+    link: "./index.html",
+    createdAt: "2026-07-01"
+  },
+  {
+    id: "example-meeting",
+    type: "example",
+    icon: "📝",
+    title: "회의록 자동 요약 봇",
+    dept: "행정지원과 (예시)",
+    category: "문서작성",
+    desc: "회의 녹취나 메모를 붙여넣으면 핵심 요약, 결정사항, 담당자별 액션아이템으로 자동 정리해 줍니다. — 등록 형식을 보여주는 예시 카드입니다.",
+    link: "",
+    createdAt: "2026-06-20"
+  },
+  {
+    id: "example-press",
+    type: "example",
+    icon: "📰",
+    title: "보도자료 초안 생성기",
+    dept: "홍보담당관 (예시)",
+    category: "홍보",
+    desc: "사업 개요 몇 줄만 넣으면 보도자료 제목·리드·본문 초안을 시정 보도 문체로 만들어 줍니다. — 예시 카드입니다.",
+    link: "",
+    createdAt: "2026-06-10"
+  },
+  {
+    id: "example-civil",
+    type: "example",
+    icon: "🗂️",
+    title: "민원 답변 도우미",
+    dept: "민원봉사과 (예시)",
+    category: "민원·정책안내",
+    desc: "자주 묻는 민원 유형을 고르면 근거 규정을 반영한 정중한 답변 초안을 제안합니다. — 예시 카드입니다.",
+    link: "",
+    createdAt: "2026-05-28"
+  }
+];
+
+/* =========================================================================
+   Store: 백엔드 어댑터 (Firebase 있으면 실시간, 없으면 localStorage)
+   ========================================================================= */
+const Store = (() => {
+  let mode = "demo";
+  let db = null;
+  let fs = null; // firestore functions
+  const CLIENT_KEY = "cheonan_hub_client";
+  let clientId = localStorage.getItem(CLIENT_KEY);
+  if (!clientId) { clientId = "c_" + Math.random().toString(36).slice(2) + Date.now().toString(36); localStorage.setItem(CLIENT_KEY, clientId); }
+
+  const listeners = { likes: {}, comments: [], submissions: [] };
+
+  async function init() {
+    if (FIREBASE_CONFIG && FIREBASE_CONFIG.projectId) {
+      try {
+        const [{ initializeApp }, firestore] = await Promise.all([
+          import("https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js"),
+          import("https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js")
+        ]);
+        const app = initializeApp(FIREBASE_CONFIG);
+        db = firestore.getFirestore(app);
+        fs = firestore;
+        mode = "live";
+      } catch (e) {
+        console.warn("Firebase 초기화 실패 → 데모 모드로 전환", e);
+        mode = "demo";
+      }
+    }
+    return mode;
+  }
+
+  /* ---------- localStorage helpers (demo) ---------- */
+  const LS = {
+    get(k, d) { try { return JSON.parse(localStorage.getItem(k)) ?? d; } catch { return d; } },
+    set(k, v) { localStorage.setItem(k, JSON.stringify(v)); }
+  };
+  function demoLikes() { return LS.get("cheonan_hub_likes", {}); }        // {agentId: count}
+  function demoMyLikes() { return LS.get("cheonan_hub_mylikes", {}); }    // {agentId: true}
+  function demoComments() { return LS.get("cheonan_hub_comments", []); }  // [{agentId,name,text,ts}]
+  function demoSubs() { return LS.get("cheonan_hub_subs", []); }          // [{...}]
+
+  /* ---------- Public API ---------- */
+  return {
+    init,
+    get mode() { return mode; },
+    clientId,
+    hasLiked(agentId) { return !!demoMyLikes()[agentId]; }, // client-side flag both modes
+
+    /* --- Likes --- */
+    async toggleLike(agentId) {
+      const my = demoMyLikes();
+      const willLike = !my[agentId];
+      if (willLike) my[agentId] = true; else delete my[agentId];
+      LS.set("cheonan_hub_mylikes", my);
+
+      if (mode === "live") {
+        const ref = fs.doc(db, "likes", agentId);
+        await fs.setDoc(ref, { count: fs.increment(willLike ? 1 : -1) }, { merge: true });
+      } else {
+        const likes = demoLikes();
+        likes[agentId] = Math.max(0, (likes[agentId] || 0) + (willLike ? 1 : -1));
+        LS.set("cheonan_hub_likes", likes);
+        emitLikes(agentId, likes[agentId]);
+      }
+      return willLike;
+    },
+    onLikes(agentId, cb) {
+      if (mode === "live") {
+        const ref = fs.doc(db, "likes", agentId);
+        return fs.onSnapshot(ref, (snap) => cb((snap.data() || {}).count || 0));
+      } else {
+        listeners.likes[agentId] = listeners.likes[agentId] || [];
+        listeners.likes[agentId].push(cb);
+        cb(demoLikes()[agentId] || 0);
+        return () => {};
+      }
+    },
+
+    /* --- Comments --- */
+    async addComment(agentId, name, text) {
+      const entry = { agentId, name, text, ts: Date.now() };
+      if (mode === "live") {
+        await fs.addDoc(fs.collection(db, "comments"), { ...entry, createdAt: fs.serverTimestamp() });
+      } else {
+        const all = demoComments(); all.push(entry); LS.set("cheonan_hub_comments", all);
+        emitComments();
+      }
+    },
+    onComments(cb) {
+      if (mode === "live") {
+        const q = fs.query(fs.collection(db, "comments"), fs.orderBy("createdAt", "asc"));
+        return fs.onSnapshot(q, (snap) => {
+          const list = snap.docs.map(d => { const x = d.data(); return { agentId: x.agentId, name: x.name, text: x.text, ts: x.createdAt?.toMillis?.() || x.ts || 0 }; });
+          cb(list);
+        });
+      } else {
+        listeners.comments.push(cb); cb(demoComments()); return () => {};
+      }
+    },
+
+    /* --- Submissions --- */
+    async addSubmission(data) {
+      const entry = { ...data, status: "pending", ts: Date.now() };
+      if (mode === "live") {
+        await fs.addDoc(fs.collection(db, "submissions"), { ...entry, createdAt: fs.serverTimestamp() });
+      } else {
+        const all = demoSubs(); all.push(entry); LS.set("cheonan_hub_subs", all);
+        emitSubs();
+      }
+    },
+    onSubmissions(cb) {
+      if (mode === "live") {
+        const q = fs.query(fs.collection(db, "submissions"), fs.orderBy("createdAt", "asc"));
+        return fs.onSnapshot(q, (snap) => cb(snap.docs.map(d => { const x = d.data(); return { ...x, ts: x.createdAt?.toMillis?.() || x.ts || 0 }; })));
+      } else {
+        listeners.submissions.push(cb); cb(demoSubs()); return () => {};
+      }
+    }
+  };
+
+  function emitLikes(agentId, val) { (listeners.likes[agentId] || []).forEach(cb => cb(val)); }
+  function emitComments() { listeners.comments.forEach(cb => cb(demoComments())); }
+  function emitSubs() { listeners.submissions.forEach(cb => cb(demoSubs())); }
+})();
+
+/* =========================================================================
+   UI / State
+   ========================================================================= */
+let AGENTS = [...SEED_AGENTS];
+let likeCounts = {};      // agentId -> count
+let commentsByAgent = {}; // agentId -> [comments]
+let activeCategory = "전체";
+let searchTerm = "";
+let sortMode = "popular";
+let currentAgentId = null;
+const ICON_CHOICES = ["🤖","📝","📰","🗂️","📊","🧮","🗺️","💬","📅","🔎","⚙️","🧾","🏥","🌱","🚗","💡"];
+
+const $ = (s) => document.querySelector(s);
+
+async function boot() {
+  const mode = await Store.init();
+  renderModeBanner(mode);
+  renderChips();
+  renderIconPicker();
+  fillCategorySelect();
+
+  // subscribe likes for every seed agent
+  AGENTS.forEach(a => {
+    Store.onLikes(a.id, (count) => { likeCounts[a.id] = count; onDataChange(); });
+  });
+  // subscribe comments
+  Store.onComments((list) => {
+    commentsByAgent = {};
+    list.sort((x,y)=>x.ts-y.ts).forEach(c => { (commentsByAgent[c.agentId] = commentsByAgent[c.agentId] || []).push(c); });
+    onDataChange();
+    if (currentAgentId) renderCommentsInModal(currentAgentId);
+  });
+  // subscribe submissions -> add as pending cards
+  Store.onSubmissions((subs) => {
+    AGENTS = [...SEED_AGENTS, ...subs.map(subToAgent)];
+    AGENTS.forEach(a => {
+      if (likeCounts[a.id] === undefined) Store.onLikes(a.id, (count) => { likeCounts[a.id] = count; onDataChange(); });
+    });
+    onDataChange();
+  });
+
+  // events
+  $("#search").addEventListener("input", (e) => { searchTerm = e.target.value.trim().toLowerCase(); renderGrid(); });
+  $("#sort").addEventListener("change", (e) => { sortMode = e.target.value; renderGrid(); });
+
+  renderGrid();
+}
+
+function subToAgent(s) {
+  return {
+    id: "sub_" + s.ts,
+    type: "pending",
+    icon: s.icon || "🤖",
+    title: s.title,
+    dept: s.dept,
+    category: s.category || "기타",
+    desc: s.desc,
+    link: s.link || "",
+    createdAt: new Date(s.ts).toISOString().slice(0,10)
+  };
+}
+
+function renderModeBanner(mode) {
+  const el = $("#mode-banner");
+  if (mode === "live") {
+    el.className = "mode-banner live";
+    el.innerHTML = `✅ <b>실시간 공유 모드</b> · 좋아요와 의견이 모든 직원에게 실시간으로 공유됩니다.`;
+  } else {
+    el.className = "mode-banner";
+    el.innerHTML = `🧪 <b>데모 모드</b> · 좋아요·의견이 지금은 <u>내 브라우저에만</u> 저장됩니다. 실시간 공유를 켜려면 README의 파이어베이스 설정을 연결하세요.
+      <button onclick="this.parentElement.style.display='none'">닫기</button>`;
+  }
+}
+
+function renderChips() {
+  $("#chips").innerHTML = CATEGORIES.map(c =>
+    `<button class="chip ${c===activeCategory?'active':''}" onclick="setCategory('${c}')">${c}</button>`
+  ).join("");
+}
+window.setCategory = (c) => { activeCategory = c; renderChips(); renderGrid(); };
+
+function fillCategorySelect() {
+  $("#s-cat").innerHTML = CATEGORIES.filter(c=>c!=="전체").map(c=>`<option value="${c}">${c}</option>`).join("");
+}
+function renderIconPicker() {
+  $("#s-icons").innerHTML = ICON_CHOICES.map((ic,i)=>`<button type="button" class="icon-opt ${i===0?'sel':''}" data-icon="${ic}" onclick="pickIcon(this)">${ic}</button>`).join("");
+}
+window.pickIcon = (el) => { document.querySelectorAll('.icon-opt').forEach(x=>x.classList.remove('sel')); el.classList.add('sel'); };
+
+/* ---------- Stats ---------- */
+function renderStats() {
+  const totalLikes = Object.values(likeCounts).reduce((a,b)=>a+(b||0),0);
+  const depts = new Set(AGENTS.map(a => a.dept.replace(/\s*\(예시\)/,'').trim()));
+  $("#stat-agents").textContent = AGENTS.filter(a=>a.type!=="pending").length + AGENTS.filter(a=>a.type==="pending").length;
+  $("#stat-likes").textContent = totalLikes;
+  $("#stat-depts").textContent = depts.size;
+}
+
+/* ---------- Grid ---------- */
+function onDataChange() { renderStats(); renderGrid(); }
+
+function filteredAgents() {
+  let list = AGENTS.filter(a => {
+    const catOk = activeCategory === "전체" || a.category === activeCategory;
+    const hay = (a.title + " " + a.dept + " " + a.desc + " " + a.category).toLowerCase();
+    const searchOk = !searchTerm || hay.includes(searchTerm);
+    return catOk && searchOk;
+  });
+  const c = (id)=> (commentsByAgent[id]||[]).length;
+  if (sortMode === "popular") list.sort((a,b)=>(likeCounts[b.id]||0)-(likeCounts[a.id]||0) || c(b.id)-c(a.id));
+  else if (sortMode === "recent") list.sort((a,b)=> (b.createdAt||"").localeCompare(a.createdAt||""));
+  else if (sortMode === "comments") list.sort((a,b)=> c(b.id)-c(a.id));
+  // keep official pinned near top on popular ties handled by likes
+  return list;
+}
+
+function badgeFor(a) {
+  if (a.type === "example") return `<span class="badge badge-example">예시</span>`;
+  if (a.type === "pending") return `<span class="badge badge-pending">검토중</span>`;
+  const isNew = a.createdAt && (Date.now() - new Date(a.createdAt).getTime()) < 1000*60*60*24*30;
+  return isNew ? `<span class="badge badge-new">NEW</span>` : "";
+}
+
+function renderGrid() {
+  const list = filteredAgents();
+  const grid = $("#grid");
+  $("#empty").style.display = list.length ? "none" : "block";
+  grid.innerHTML = list.map(a => {
+    const likes = likeCounts[a.id] || 0;
+    const liked = Store.hasLiked(a.id);
+    const cCount = (commentsByAgent[a.id]||[]).length;
+    const canTry = a.link && a.type !== "example" && a.type !== "pending";
+    return `
+    <div class="card">
+      <div class="card-top">
+        <div class="card-icon">${a.icon}</div>
+        <div class="card-titles">
+          <div class="card-title">${esc(a.title)}</div>
+          <div class="card-dept">🏢 ${esc(a.dept)}</div>
+        </div>
+      </div>
+      <div class="badges"><span class="badge badge-cat">${a.category}</span>${badgeFor(a)}</div>
+      <div class="card-desc">${esc(a.desc)}</div>
+      <div class="card-foot">
+        <button class="like-btn ${liked?'liked':''}" onclick="quickLike('${a.id}', this)">${liked?'❤️':'🤍'} <span>${likes}</span></button>
+        <button class="comment-btn" onclick="openDetail('${a.id}')">💬 ${cCount}</button>
+        ${canTry
+          ? `<a class="try-btn" href="${a.link}" target="_blank">체험 →</a>`
+          : `<button class="try-btn disabled" onclick="openDetail('${a.id}')">자세히</button>`}
+      </div>
+    </div>`;
+  }).join("");
+}
+
+window.quickLike = async (agentId, btn) => {
+  btn.classList.add('liked'); // optimistic
+  await Store.toggleLike(agentId);
+  renderGrid();
+};
+
+/* ---------- Detail modal ---------- */
+window.openDetail = (agentId) => {
+  currentAgentId = agentId;
+  const a = AGENTS.find(x => x.id === agentId);
+  if (!a) return;
+  $("#d-icon").textContent = a.icon;
+  $("#d-title").textContent = a.title;
+  $("#d-dept").innerHTML = "🏢 " + esc(a.dept);
+  $("#d-desc").textContent = a.desc;
+  const tryBtn = $("#d-try");
+  if (a.link && a.type !== "example" && a.type !== "pending") {
+    tryBtn.style.display = "inline-flex"; tryBtn.href = a.link;
+    tryBtn.textContent = "체험하기 →";
+  } else {
+    tryBtn.style.display = "none";
+  }
+  updateDetailLike();
+  renderCommentsInModal(agentId);
+  openModal("detail-modal");
+};
+
+function updateDetailLike() {
+  const liked = Store.hasLiked(currentAgentId);
+  const btn = $("#d-like");
+  btn.classList.toggle("liked", liked);
+  btn.querySelector("#d-like-count").textContent = likeCounts[currentAgentId] || 0;
+  btn.firstChild.textContent = liked ? "❤️ " : "🤍 ";
+}
+window.toggleLikeCurrent = async () => {
+  await Store.toggleLike(currentAgentId);
+  updateDetailLike(); renderGrid();
+};
+
+function renderCommentsInModal(agentId) {
+  const list = commentsByAgent[agentId] || [];
+  $("#d-comment-count").textContent = list.length;
+  $("#d-comments").innerHTML = list.length
+    ? list.map(c => `
+      <div class="comment">
+        <div class="comment-meta"><b>${esc(c.name||'익명')}</b><span>${timeAgo(c.ts)}</span></div>
+        <div class="comment-text">${esc(c.text)}</div>
+      </div>`).join("")
+    : `<div style="color:var(--text-mute);font-size:13px;padding:6px 2px 12px">아직 의견이 없어요. 첫 의견을 남겨보세요!</div>`;
+}
+
+window.submitComment = async () => {
+  const name = $("#c-name").value.trim();
+  const text = $("#c-text").value.trim();
+  if (!text) { toast("의견 내용을 입력해주세요"); return; }
+  await Store.addComment(currentAgentId, name || "익명", text);
+  $("#c-text").value = "";
+  toast("의견이 등록되었어요 🙌");
+  renderCommentsInModal(currentAgentId);
+  renderGrid();
+};
+
+/* ---------- Submit modal ---------- */
+window.openSubmit = () => openModal("submit-modal");
+window.submitAgent = async () => {
+  const title = $("#s-name").value.trim();
+  const dept = $("#s-dept").value.trim();
+  const desc = $("#s-desc").value.trim();
+  const category = $("#s-cat").value;
+  const link = $("#s-link").value.trim();
+  const icon = document.querySelector(".icon-opt.sel")?.dataset.icon || "🤖";
+  if (!title || !dept || !desc) { toast("이름·부서·소개는 필수예요"); return; }
+  await Store.addSubmission({ title, dept, desc, category, link, icon });
+  ["s-name","s-dept","s-desc","s-link"].forEach(id => $("#"+id).value = "");
+  closeModal("submit-modal");
+  toast("등록 신청 완료! 검토 후 공유됩니다 ✨");
+};
+
+/* ---------- Modal helpers ---------- */
+window.openModal = (id) => { $("#"+id).classList.add("open"); document.body.style.overflow="hidden"; };
+window.closeModal = (id) => { $("#"+id).classList.remove("open"); document.body.style.overflow=""; if(id==="detail-modal") currentAgentId=null; };
+
+/* ---------- utils ---------- */
+function esc(s){ return String(s??"").replace(/[&<>"']/g, m=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[m])); }
+function timeAgo(ts){
+  if(!ts) return "";
+  const d = Date.now()-ts, m=Math.floor(d/60000), h=Math.floor(m/60), day=Math.floor(h/24);
+  if(m<1) return "방금"; if(m<60) return m+"분 전"; if(h<24) return h+"시간 전"; if(day<30) return day+"일 전";
+  return new Date(ts).toISOString().slice(0,10);
+}
+let toastT;
+window.toast = (msg) => {
+  const t = $("#toast"); t.textContent = msg; t.classList.add("show");
+  clearTimeout(toastT); toastT = setTimeout(()=>t.classList.remove("show"), 2200);
+};
+
+boot();
+</script>
+</body>
+</html>
